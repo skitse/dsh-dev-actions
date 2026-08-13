@@ -1,20 +1,19 @@
 # DSH Dev Actions
 
-`dsh-dev-actions` is a small companion plugin for [dsh-better-sidebar](https://github.com/omdsh-dev/DSH-better-sidebar). It keeps the usual DeepSeek Harness conversation loop intact while placing a Flutter run surface beside it: choose a device, run, hot reload, restart, stop, inspect output, and return a concise acceptance signal.
+`dsh-dev-actions` is a small companion plugin for [dsh-better-sidebar](https://github.com/omdsh-dev/DSH-better-sidebar). It lets an agent turn a useful repeated development command into a visible, user-approved action card beside the normal DeepSeek Harness conversation.
 
 It does not replace the terminal, project workflow, or Human-in-the-Loop. It removes the repetitive path/device/terminal steps when the user wants to inspect a change.
 
 ## Scope
 
-The initial release supports a Flutter workspace whose `pubspec.yaml` is at the session workspace root:
+The initial release is deliberately generic:
 
-- reads `flutter devices --machine` to populate the device selector;
-- runs `flutter run -d <selected-device>` in the session workspace;
-- keeps the process and bounded output in the current DSH host process;
-- sends `r`, `R`, or `SIGINT` only through explicit UI buttons;
-- gives an agent a small `dev_action_offer` tool to highlight a suggested user action without passing shell commands or device IDs.
+- shows the exact command and the agent's reason before execution;
+- executes only a user-clicked, agent-proposed command in the current session workspace;
+- keeps bounded output and a stop control in the panel;
+- gives the agent `dev_action_offer` and `dev_action_feedback_read` to propose an action and retrieve explicit user verification.
 
-Web, Xcode, simulator streaming, remote hosts, certificate management, and arbitrary command execution are deliberately out of scope for this release.
+Flutter, Web, Xcode, Docker, and test commands are examples that use the same primitive. Simulator streaming, remote hosts, certificate management, action persistence, and autonomous model execution are deliberately out of scope for this release.
 
 ## Install
 
@@ -29,7 +28,7 @@ dsh web
 
 Restart a running `dsh web` process and hard-refresh the browser after installation. `Dev Actions` appears in the sidebar's add-tab menu for a selected session.
 
-For local development, use a profile dependency pointing at this checkout after building it. The package expects the same published DSH RC line as `dsh-better-sidebar`.
+For local development, use a profile dependency pointing at this checkout after building it. The package expects the same published DSH RC line as `dsh-better-sidebar`. Test against the exact profile and host URL you intend to use: the plugin follows DSH's trusted-host and same-origin request boundary, including a configured LAN/tunnel authority.
 
 ## Agent Use
 
@@ -37,18 +36,19 @@ After changing a Flutter screen, an agent can offer a human verification entry p
 
 ```text
 dev_action_offer({
-  action: "flutter.run",
-  message: "The login screen was updated. Run it on an iPhone Simulator to verify the layout."
+  label: "Run iOS simulator",
+  command: "flutter run -d 'iPhone 16 Pro'",
+  reason: "The login screen was updated and needs a visual check."
 })
 ```
 
-The panel resolves the real device IDs independently. The user may run the app, inspect output, choose **Verified**, or select **Report issue**. The latter is intentionally explicit: this release does not silently resume or steer an agent session from browser-side code.
+The user may inspect the command, run it, inspect output, choose **Verified**, or select **Report issue**. Feedback is retained for the current agent and can be read with `dev_action_feedback_read`; this release does not silently resume or steer an agent session from browser-side code.
 
 ## Security Boundary
 
 - The host requires the session's authoritative attached workspace directory and never accepts a browser-provided path.
-- The model never supplies a raw command, a device ID, or a path to `dev_action_offer`.
-- Only `flutter run`, `r`, `R`, and stop are exposed in this release.
+- The model may propose a raw command, but it cannot execute it by proposing it: the command remains a visible action card until the user clicks **Run**.
+- The browser can execute only a previously stored action ID; it cannot substitute a command or workspace path.
 - Output is bounded to 128 KiB and stays local to the current DSH host process.
 - This package assumes the DSH Web host is used on a trusted local machine. It should not be exposed directly to an untrusted network.
 

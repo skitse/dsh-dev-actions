@@ -1,9 +1,15 @@
 import type { IncomingMessage, ServerResponse } from 'node:http'
 
 export async function readJson(req: IncomingMessage): Promise<Record<string, unknown>> {
-  let body = ''
-  for await (const chunk of req) body += String(chunk)
-  if (body.length > 64 * 1024) throw new Error('request too large')
+  const chunks: Buffer[] = []
+  let size = 0
+  for await (const chunk of req) {
+    const bytes = Buffer.isBuffer(chunk) ? chunk : Buffer.from(String(chunk))
+    size += bytes.byteLength
+    if (size > 64 * 1024) throw new Error('request too large')
+    chunks.push(bytes)
+  }
+  const body = Buffer.concat(chunks).toString('utf8')
   const value: unknown = body === '' ? {} : JSON.parse(body)
   if (value === null || typeof value !== 'object' || Array.isArray(value)) throw new Error('object body required')
   return value as Record<string, unknown>

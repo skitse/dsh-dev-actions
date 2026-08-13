@@ -3,6 +3,8 @@
 .title { font-size: 14px; font-weight: 650; }
 .message { margin-top: 7px; color: var(--dsh-muted, #adb0b7); white-space: pre-wrap; }
 .body { padding: 12px; display: grid; gap: 10px; overflow: auto; }
+.card { display: grid; gap: 8px; padding: 10px; border: 1px solid rgba(127,127,127,.25); border-radius: 5px; }
+.command { margin: 0; padding: 8px; overflow: auto; white-space: pre-wrap; background: #101114; color: #d9dde5; font: 11px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; }
 .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 .select { flex: 1 1 170px; min-width: 0; height: 30px; border: 1px solid rgba(127,127,127,.4); background: transparent; color: inherit; border-radius: 4px; padding: 0 8px; }
 .button { height: 30px; border: 1px solid rgba(127,127,127,.45); background: rgba(255,255,255,.08); color: inherit; border-radius: 4px; padding: 0 10px; cursor: pointer; }

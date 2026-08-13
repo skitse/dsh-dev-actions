@@ -1,0 +1,9 @@
+{
+  "id": "skitse/dsh-dev-actions",
+  "version": "0.1.0",
+  "main": "./lib/index.mjs",
+  "description": "Agent-proposed reusable development commands as user-approved DSH sidebar actions.",
+  "engines": { "dsh": ">=0.1.0-rc.6" },
+  "contributes": { "tools": ["dev_action_offer", "dev_action_feedback_read"], "skills": [] },
+  "client": { "main": "./lib/client.js" }
+}
