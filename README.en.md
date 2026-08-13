@@ -80,7 +80,7 @@ Actions may be workspace-wide or session-only. Users can pin, hide, restore, run
 
 Real workflows from other developers are the point of this project. Contributions are especially welcome for Flutter device discovery, dev-server URL detection, Xcode and Android adapters, parameterized actions, templates and sharing, risk UX, accessibility, localization, and a generic action interop contract for other DSH plugins.
 
-Start with a [`good first issue`](https://github.com/skitse/dsh-dev-actions/labels/good%20first%20issue), a [`help wanted`](https://github.com/skitse/dsh-dev-actions/labels/help%20wanted) item, or submit a [workflow proposal](https://github.com/skitse/dsh-dev-actions/issues/new?template=workflow.yml). See [CONTRIBUTING.md](CONTRIBUTING.md) for architecture and validation.
+Start with a [`good first issue`](https://github.com/skitse/dsh-dev-actions/labels/good%20first%20issue), a [`help wanted`](https://github.com/skitse/dsh-dev-actions/labels/help%20wanted) item, submit a concrete [workflow proposal](https://github.com/skitse/dsh-dev-actions/issues/new?template=workflow.yml), or share an early idea in the [real-workflow discussion](https://github.com/skitse/dsh-dev-actions/discussions/4). See [CONTRIBUTING.md](CONTRIBUTING.md) for architecture and validation.
 
 ## Scope
 

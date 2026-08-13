@@ -8,6 +8,7 @@ English README: https://github.com/skitse/dsh-dev-actions/blob/main/README.en.md
 Contributing: https://github.com/skitse/dsh-dev-actions/blob/main/CONTRIBUTING.md
 Releases: https://github.com/skitse/dsh-dev-actions/releases
 Issue tracker: https://github.com/skitse/dsh-dev-actions/issues
+Workflow ideas and discussion: https://github.com/skitse/dsh-dev-actions/discussions/4
 License: MIT
 
 ## Why use it

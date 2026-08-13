@@ -103,7 +103,7 @@ dsh plugin --profile web add dsh-better-sidebar@^0.10.3 link:"$(pwd)"
 - 风险提示、无障碍、多语言和面板交互改进；
 - 与其他 DSH 插件协作的通用动作协议。
 
-不必先理解整个 DSH。可以从带有 [`good first issue`](https://github.com/skitse/dsh-dev-actions/labels/good%20first%20issue) 或 [`help wanted`](https://github.com/skitse/dsh-dev-actions/labels/help%20wanted) 的任务开始，也可以用[场景提案](https://github.com/skitse/dsh-dev-actions/issues/new?template=workflow.yml)描述你每天重复做的那一步。
+不必先理解整个 DSH。可以从带有 [`good first issue`](https://github.com/skitse/dsh-dev-actions/labels/good%20first%20issue) 或 [`help wanted`](https://github.com/skitse/dsh-dev-actions/labels/help%20wanted) 的任务开始；明确需求可提交[场景提案](https://github.com/skitse/dsh-dev-actions/issues/new?template=workflow.yml)，还在探索的想法可以参加[真实工作流征集](https://github.com/skitse/dsh-dev-actions/discussions/4)。
 
 ## 开发验证
 
