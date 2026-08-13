@@ -1,0 +1,24 @@
+import type { IncomingMessage, ServerResponse } from 'node:http'
+
+export async function readJson(req: IncomingMessage): Promise<Record<string, unknown>> {
+  let body = ''
+  for await (const chunk of req) body += String(chunk)
+  if (body.length > 64 * 1024) throw new Error('request too large')
+  const value: unknown = body === '' ? {} : JSON.parse(body)
+  if (value === null || typeof value !== 'object' || Array.isArray(value)) throw new Error('object body required')
+  return value as Record<string, unknown>
+}
+
+export function json(res: ServerResponse, status: number, value: unknown): void {
+  res.writeHead(status, { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store' })
+  res.end(JSON.stringify(value))
+}
+
+export function ok(res: ServerResponse, value: unknown): void { json(res, 200, { ok: true, value }) }
+export function fail(res: ServerResponse, status: number, message: string): void { json(res, status, { ok: false, error: { message } }) }
+
+export function stringField(body: Record<string, unknown>, key: string): string {
+  const value = body[key]
+  if (typeof value !== 'string' || value.length === 0 || value.length > 200) throw new Error(`${key} must be a non-empty string`)
+  return value
+}
