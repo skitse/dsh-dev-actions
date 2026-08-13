@@ -1,3 +1,9 @@
 - insert:
     - id: dsh-dev-actions
       name: 'dsh-dev-actions'
+      inject:
+        - skills
+        - shell
+        - sandboxPolicy
+        - systemPrompt
+        - storageDomain

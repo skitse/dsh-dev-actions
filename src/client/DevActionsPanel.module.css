@@ -1,18 +1,26 @@
 .root { display: flex; flex-direction: column; height: 100%; min-height: 0; color: var(--dsh-fg, #e8e8ea); background: var(--dsh-panel, #16171a); font: 13px/1.45 system-ui, sans-serif; }
-.head { padding: 12px; border-bottom: 1px solid rgba(127,127,127,.25); }
+.head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 12px; border-bottom: 1px solid rgba(127,127,127,.25); }
 .title { font-size: 14px; font-weight: 650; }
-.message { margin-top: 7px; color: var(--dsh-muted, #adb0b7); white-space: pre-wrap; }
-.body { padding: 12px; display: grid; gap: 10px; overflow: auto; }
+.message { margin-top: 5px; color: var(--dsh-muted, #adb0b7); white-space: pre-wrap; }
+.tabs { display: grid; grid-template-columns: 1fr 1fr; padding: 8px 12px 0; border-bottom: 1px solid rgba(127,127,127,.18); }
+.tab, .tabActive { height: 32px; border: 0; border-bottom: 2px solid transparent; background: transparent; color: var(--dsh-muted, #adb0b7); cursor: pointer; }
+.tabActive { border-bottom-color: #2f81f7; color: inherit; font-weight: 600; }
+.body { flex: 1; min-height: 0; padding: 10px 12px 18px; display: grid; align-content: start; gap: 10px; overflow: auto; }
 .card { display: grid; gap: 8px; padding: 10px; border: 1px solid rgba(127,127,127,.25); border-radius: 5px; }
-.command { margin: 0; padding: 8px; overflow: auto; white-space: pre-wrap; background: #101114; color: #d9dde5; font: 11px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; }
-.row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-.select { flex: 1 1 170px; min-width: 0; height: 30px; border: 1px solid rgba(127,127,127,.4); background: transparent; color: inherit; border-radius: 4px; padding: 0 8px; }
-.button { height: 30px; border: 1px solid rgba(127,127,127,.45); background: rgba(255,255,255,.08); color: inherit; border-radius: 4px; padding: 0 10px; cursor: pointer; }
-.button:hover:not(:disabled) { background: rgba(255,255,255,.16); }
-.button:disabled { opacity: .45; cursor: default; }
+.cardHead { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.label { display: flex; align-items: center; gap: 7px; min-width: 0; }
+.kind { flex: none; padding: 1px 5px; border: 1px solid #2f81f7; color: #79b8ff; border-radius: 3px; font-size: 10px; line-height: 16px; }
+.kind[data-kind='command'] { border-color: #3fb950; color: #69d47b; }
+.kind[data-kind='instruction'] { border-color: #d29922; color: #e3b341; }
+.content { margin: 0; padding: 8px; max-height: 150px; overflow: auto; white-space: pre-wrap; word-break: break-word; background: #101114; color: #d9dde5; font: 11px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; }
+.meta { font-size: 11px; color: var(--dsh-muted, #8b9099); }
+.row { display: flex; gap: 7px; align-items: center; flex-wrap: wrap; }
+.button, .iconButton { height: 29px; border: 1px solid rgba(127,127,127,.45); background: rgba(255,255,255,.07); color: inherit; border-radius: 4px; padding: 0 9px; cursor: pointer; }
+.iconButton { width: 29px; flex: none; padding: 0; font-size: 16px; }
+.button:hover:not(:disabled), .iconButton:hover:not(:disabled) { background: rgba(255,255,255,.14); }
+.button:disabled, .iconButton:disabled { opacity: .45; cursor: default; }
 .primary { background: #2575d6; border-color: #2575d6; color: #fff; }
-.danger { color: #ffb7b7; }
-.status { font-size: 12px; color: var(--dsh-muted, #adb0b7); }
+.danger { border-color: #b94a4a; color: #ffb7b7; }
 .error { padding: 8px; border-left: 3px solid #db6a6a; background: rgba(180,55,55,.14); color: #ffcdcd; }
-.log { min-height: 130px; max-height: 280px; overflow: auto; margin: 0; padding: 9px; border: 1px solid rgba(127,127,127,.25); background: #101114; color: #d9dde5; white-space: pre-wrap; font: 11px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; }
-.empty { color: var(--dsh-muted, #adb0b7); padding: 18px 0; }
+.log { min-height: 90px; max-height: 240px; overflow: auto; margin: 0; padding: 9px; border: 1px solid rgba(127,127,127,.25); background: #101114; color: #d9dde5; white-space: pre-wrap; font: 11px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; }
+.empty { color: var(--dsh-muted, #adb0b7); padding: 24px 4px; text-align: center; }

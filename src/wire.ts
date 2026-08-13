@@ -23,8 +23,22 @@ export function json(res: ServerResponse, status: number, value: unknown): void 
 export function ok(res: ServerResponse, value: unknown): void { json(res, 200, { ok: true, value }) }
 export function fail(res: ServerResponse, status: number, message: string): void { json(res, status, { ok: false, error: { message } }) }
 
-export function stringField(body: Record<string, unknown>, key: string): string {
+export function stringField(body: Record<string, unknown>, key: string, max = 200): string {
   const value = body[key]
-  if (typeof value !== 'string' || value.length === 0 || value.length > 200) throw new Error(`${key} must be a non-empty string`)
+  if (typeof value !== 'string' || value.length === 0 || value.length > max) throw new Error(`${key} must be a non-empty string`)
+  return value
+}
+
+export function optionalStringField(body: Record<string, unknown>, key: string, max = 200): string | undefined {
+  const value = body[key]
+  if (value === undefined) return undefined
+  if (typeof value !== 'string' || value.length === 0 || value.length > max) throw new Error(`${key} must be a non-empty string`)
+  return value
+}
+
+export function booleanField(body: Record<string, unknown>, key: string, optional = false): boolean | undefined {
+  const value = body[key]
+  if (optional && value === undefined) return undefined
+  if (typeof value !== 'boolean') throw new Error(`${key} must be a boolean`)
   return value
 }

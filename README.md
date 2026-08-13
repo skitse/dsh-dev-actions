@@ -1,58 +1,87 @@
-# DSH Dev Actions
+# DSH 快捷动作
 
-`dsh-dev-actions` is a small companion plugin for [dsh-better-sidebar](https://github.com/omdsh-dev/DSH-better-sidebar). It lets an agent turn a useful repeated development command into a visible, user-approved action card beside the normal DeepSeek Harness conversation.
+`dsh-dev-actions` 是一个由 AI 主动维护、由用户决定何时触发的 DeepSeek Harness 快捷操作面板。它作为 [dsh-better-sidebar](https://github.com/omdsh-dev/DSH-better-sidebar) 的 companion plugin 工作，把开发过程中值得重复使用的操作放到对话旁边，减少来回找路径、设备 ID、命令参数和重复措辞。
 
-It does not replace the terminal, project workflow, or Human-in-the-Loop. It removes the repetitive path/device/terminal steps when the user wants to inspect a change.
+这不是一个需要用户反复整理的快捷启动器。插件会通过系统提示持续告诉当前 AI：只要发现一个操作具有明显复用价值，就应主动调用 `dev_action_upsert` 创建或更新对应按钮，不必等用户要求“把它做成按钮”。AI 负责识别和维护入口；执行、发送和验收仍由用户点击完成。
 
-## Scope
+## 它能放什么
 
-The initial release is deliberately generic:
+| 类型 | 典型用途 | 点击后的行为 |
+| --- | --- | --- |
+| 命令 | `flutter run`、启动 dev server、运行聚焦测试、打开模拟器、查看日志 | 在当前会话绑定的真实工作区执行，面板显示日志并可停止 |
+| Prompt | “重新检查登录授权流程并修复剩余问题”一类可重复任务 | 通过 DSH 正式的 `session.prompt(..., 'queue')` 路径发送为新一轮用户消息 |
+| AI 指令 | 用户经常重复的偏好、验收要求或协作方式 | 只填入当前会话输入框，留给用户检查和修改后发送 |
 
-- shows the exact command and the agent's reason before execution;
-- executes only a user-clicked, agent-proposed command in the current session workspace;
-- keeps bounded output and a stop control in the panel;
-- gives the agent `dev_action_offer` and `dev_action_feedback_read` to propose an action and retrieve explicit user verification.
+动作可以按“工作区”持久化，跨该项目的会话复用；也可以只属于当前会话，用于临时验收。AI 使用稳定 key 自动更新和去重，用户可以固定、隐藏、恢复、标记通过或反馈问题。反馈问题会唤起当前会话，AI 再通过 `dev_action_feedback_read` 读取具体内容继续处理。
 
-Flutter, Web, Xcode, Docker, and test commands are examples that use the same primitive. Simulator streaming, remote hosts, certificate management, action persistence, and autonomous model execution are deliberately out of scope for this release.
+## 主动维护机制
 
-## Install
+插件注册了一段稳定的 `systemPrompt.section(...)`，要求模型在正常开发 loop 中持续判断：
 
-Install the maintained sidebar host first, then this companion:
+- 是否会再次用到这个命令、Prompt 或用户习惯性指令；
+- 它是否能省掉路径、设备、参数、窗口切换或重复措辞；
+- 应该跨工作区会话保留，还是只用于当前验收；
+- 是否已有相同 stable key 的动作需要更新，而不是新增；
+- 旧入口是否已经失效，需要隐藏。
+
+同时提供一个可显式调用的 `dev-actions-maintainer` skill，用于让 AI 全面整理或审计当前动作库。日常主动发现依靠系统提示和工具，不要求用户先调用 skill。
+
+模型可用工具：
+
+- `dev_action_upsert`：新增或更新动作；
+- `dev_action_list`：读取当前动作库；
+- `dev_action_retire`：隐藏已经过时的动作；
+- `dev_action_feedback_read`：读取用户的验收与问题反馈。
+
+## 安装
+
+当前 GitHub 仓库已经可用，但 `dsh-dev-actions` 尚未发布到 npm。请先使用本地链接安装，不要直接运行旧版 README 中的 npm 包命令。
 
 ```sh
+git clone https://github.com/skitse/dsh-dev-actions.git
+cd dsh-dev-actions
+pnpm install
+pnpm build
+
 dsh plugin --profile web add dsh-better-sidebar@^0.10.3
-dsh plugin --profile web add dsh-dev-actions@^0.1.0
+dsh plugin --profile web add link:"$(pwd)"
 dsh --profile web --dump-config
-dsh web
 ```
 
-Restart a running `dsh web` process and hard-refresh the browser after installation. `Dev Actions` appears in the sidebar's add-tab menu for a selected session.
+重启 `dsh web`，浏览器硬刷新后，在 Better Sidebar 的添加标签菜单中选择“快捷动作”。如果 DSH 使用自定义主目录，请为以上命令设置同一个 `DSH_HOME`。
 
-For local development, use a profile dependency pointing at this checkout after building it. The package expects the same published DSH RC line as `dsh-better-sidebar`. Test against the exact profile and host URL you intend to use: the plugin follows DSH's trusted-host and same-origin request boundary, including a configured LAN/tunnel authority.
+## Flutter 示例
 
-## Agent Use
-
-After changing a Flutter screen, an agent can offer a human verification entry point:
+模型完成 Flutter 界面修改后，可以主动创建一个工作区动作：
 
 ```text
-dev_action_offer({
-  label: "Run iOS simulator",
-  command: "flutter run -d 'iPhone 16 Pro'",
-  reason: "The login screen was updated and needs a visual check."
+dev_action_upsert({
+  key: "flutter.ios.run",
+  kind: "command",
+  label: "在 iOS 模拟器运行",
+  content: "flutter run -d 'iPhone 16 Pro'",
+  reason: "该项目每次界面修改后都需要在固定模拟器上验收。",
+  scope: "workspace"
 })
 ```
 
-The user may inspect the command, run it, inspect output, choose **Verified**, or select **Report issue**. Feedback is retained for the current agent and can be read with `dev_action_feedback_read`; this release does not silently resume or steer an agent session from browser-side code.
+后续设备或命令变化时，模型继续使用 `flutter.ios.run`，Panel 会更新原按钮而不是堆出重复项。Web、Xcode、Docker、后端服务、聚焦测试和日志观察都使用同一个机制，不需要为每种框架开发一套插件。
 
-## Security Boundary
+## 安全边界
 
-- The host requires the session's authoritative attached workspace directory and never accepts a browser-provided path.
-- The model may propose a raw command, but it cannot execute it by proposing it: the command remains a visible action card until the user clicks **Run**.
-- The browser can execute only a previously stored action ID; it cannot substitute a command or workspace path.
-- Output is bounded to 128 KiB and stays local to the current DSH host process.
-- This package assumes the DSH Web host is used on a trusted local machine. It should not be exposed directly to an untrusted network.
+- AI 可以提出或更新动作，但不能因为提出动作而执行它。
+- Panel 完整显示命令、Prompt 或指令内容及其复用理由。
+- 浏览器提交服务器已经保存的 action ID 与内容版本指纹；动作有任何更新都会要求刷新并重新检查，不能替换命令或工作区路径。
+- Host 只使用 Session 上记录的权威工作区，并对路径做 `realpath` 解析。
+- 命令通过 DSH 自带的受管 Shell 和当前 Session 沙箱策略运行；环境会清除 credential-shaped 与 `DSH_*` 变量，停止操作终止并等待整棵进程树。
+- Prompt 只会在用户点击“发送”后成为新一轮消息；AI 指令默认只进入可编辑输入框。
+- 系统提示明确禁止把密钥、凭据、破坏性操作和一次性命令加入动作库。
+- 命令输出保留最近 128 KiB；活动运行会在插件卸载或 DSH 退出时被终止并等待退出。
+- Web API 沿用 DSH 已有的 Host 与同源请求边界，不新增任何部署配置。
 
-## Verification
+插件不会自动点击任何按钮，也不会把模型生成的数据变成新的动态特权工具。模型只提供经过 schema 验证的动作数据；执行器、Prompt 通路和持久化边界都由插件固定实现。
+
+## 开发与验证
 
 ```sh
 pnpm install
@@ -62,4 +91,8 @@ pnpm build
 npm pack --dry-run
 ```
 
-Before publishing, test an actual Flutter workspace: open the panel, select a device, run, observe output, hot reload after an edit, stop, and confirm the panel does not access a different session's workspace.
+发布前应在真实 DSH Web profile 中验证：client bundle 出现在 boot manifest（`exports["./package.json"]` 是 DSH 扫描包声明所必需的）；“快捷动作”标签可见；三种动作分别能运行、发送或填入输入框；工作区动作在新会话中仍存在；会话动作不会泄漏到其他会话；隐藏、恢复、固定、反馈和停止均正常。
+
+## 当前边界
+
+本版本只解决“让用户一触即达”，不重建 IDE、设备控制或 GUI 自动化。其他插件以后可以把自己的高频操作接入同一种动作模型，但不属于本插件当前职责。
