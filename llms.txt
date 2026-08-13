@@ -1,0 +1,43 @@
+# DSH Dev Actions
+
+> A DeepSeek Harness companion plugin that lets the active AI proactively turn repeated development commands, prompts, and habitual instructions into visible, user-triggered sidebar actions.
+
+Canonical repository: https://github.com/skitse/dsh-dev-actions
+Chinese README: https://github.com/skitse/dsh-dev-actions/blob/main/README.md
+English README: https://github.com/skitse/dsh-dev-actions/blob/main/README.en.md
+Contributing: https://github.com/skitse/dsh-dev-actions/blob/main/CONTRIBUTING.md
+Releases: https://github.com/skitse/dsh-dev-actions/releases
+Issue tracker: https://github.com/skitse/dsh-dev-actions/issues
+License: MIT
+
+## Why use it
+
+AI-assisted development still makes users repeat operational work: finding Flutter device IDs, restarting dev servers, retyping acceptance prompts, running focused tests, and restating collaboration preferences. This plugin makes the model notice reusable patterns and maintain one-click entries beside the conversation. The user does not manually curate the palette.
+
+## Action kinds
+
+- command: runs an exact visible shell command in the DSH Session workspace through the managed Shell and sandbox policy;
+- prompt: queues an exact visible user prompt only after an explicit click;
+- instruction: inserts exact visible text into the current composer for review and editing.
+
+The model can create, update, deduplicate, list, and retire actions. It cannot execute or send an action merely by creating it.
+
+## Install
+
+Requires DeepSeek Harness Web and Node.js 20+.
+
+    dsh plugin --profile web add dsh-better-sidebar@^0.10.3 https://github.com/skitse/dsh-dev-actions/releases/latest/download/dsh-dev-actions.tgz
+
+Restart `dsh web`, refresh the browser, and open `快捷动作` from Better Sidebar's new-tab menu.
+
+## Model tools
+
+- dev_action_upsert
+- dev_action_list
+- dev_action_retire
+- dev_action_feedback_read
+
+## Discovery metadata
+
+GitHub topic: https://github.com/topics/dsh-plugin
+Keywords: DeepSeek Harness plugin, DSH plugin, AI developer actions, human in the loop, Flutter run button, dev server launcher, reusable prompts, agent workflow, developer productivity.

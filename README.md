@@ -1,87 +1,111 @@
 # DSH 快捷动作
 
-`dsh-dev-actions` 是一个由 AI 主动维护、由用户决定何时触发的 DeepSeek Harness 快捷操作面板。它作为 [dsh-better-sidebar](https://github.com/omdsh-dev/DSH-better-sidebar) 的 companion plugin 工作，把开发过程中值得重复使用的操作放到对话旁边，减少来回找路径、设备 ID、命令参数和重复措辞。
+**让 AI 把你会重复做的开发操作，主动变成对话旁边的一键按钮。**
 
-这不是一个需要用户反复整理的快捷启动器。插件会通过系统提示持续告诉当前 AI：只要发现一个操作具有明显复用价值，就应主动调用 `dev_action_upsert` 创建或更新对应按钮，不必等用户要求“把它做成按钮”。AI 负责识别和维护入口；执行、发送和验收仍由用户点击完成。
+[English](README.en.md) | [安装](#一分钟安装) | [参与开发](CONTRIBUTING.md) | [路线图](#欢迎一起开发)
 
-## 它能放什么
+[![DeepSeek Harness](https://img.shields.io/badge/DeepSeek-Harness-4b73ff)](https://github.com/deepseek-ai/deepseek-harness)
+[![DSH Plugin](https://img.shields.io/badge/topic-dsh--plugin-238636)](https://github.com/topics/dsh-plugin)
+[![Release](https://img.shields.io/github/v/release/skitse/dsh-dev-actions)](https://github.com/skitse/dsh-dev-actions/releases)
+[![CI](https://github.com/skitse/dsh-dev-actions/actions/workflows/ci.yml/badge.svg)](https://github.com/skitse/dsh-dev-actions/actions/workflows/ci.yml)
+[![License](https://img.shields.io/github/license/skitse/dsh-dev-actions)](LICENSE)
 
-| 类型 | 典型用途 | 点击后的行为 |
+你在让 AI 开发时，经常会遇到这些小麻烦：
+
+- 每次改完 Flutter 页面，都要重新找设备 ID，再输入 `flutter run -d ...`；
+- 每次改完登录，都要再次描述同一套登录、授权回调和退出登录验收；
+- 每次出问题，都要重复提醒 AI“先复现并记录证据，不要只说构建通过”；
+- dev server、聚焦测试、日志命令明明刚用过，下一轮还要回终端、找目录、重新输入。
+
+`dsh-dev-actions` 会让当前模型在正常工作中主动发现这些重复模式，并把它们维护成“快捷动作”。你不需要自己整理快捷方式，也不需要先提醒 AI 做按钮；只要在需要时点一下。
+
+<p align="center">
+  <img src="docs/assets/dev-actions-panel.png" width="420" alt="DSH 快捷动作面板，展示命令、Prompt 和 AI 指令三种可复用动作">
+</p>
+
+## 它到底能做什么
+
+| AI 发现的重复操作 | 自动留下的入口 | 你点击后 |
 | --- | --- | --- |
-| 命令 | `flutter run`、启动 dev server、运行聚焦测试、打开模拟器、查看日志 | 在当前会话绑定的真实工作区执行，面板显示日志并可停止 |
-| Prompt | “重新检查登录授权流程并修复剩余问题”一类可重复任务 | 通过 DSH 正式的 `session.prompt(..., 'queue')` 路径发送为新一轮用户消息 |
-| AI 指令 | 用户经常重复的偏好、验收要求或协作方式 | 只填入当前会话输入框，留给用户检查和修改后发送 |
+| `flutter run -d chrome`、启动 dev server、聚焦测试、日志命令 | **命令**按钮 | 在当前项目运行，可看日志、可停止 |
+| “重新验收登录和授权流程” | **Prompt**按钮 | 作为一轮新的用户消息发给当前 AI |
+| “先复现再修复”“改完必须真实验收” | **AI 指令**按钮 | 先填入输入框，由你检查或修改后发送 |
 
-动作可以按“工作区”持久化，跨该项目的会话复用；也可以只属于当前会话，用于临时验收。AI 使用稳定 key 自动更新和去重，用户可以固定、隐藏、恢复、标记通过或反馈问题。反馈问题会唤起当前会话，AI 再通过 `dev_action_feedback_read` 读取具体内容继续处理。
+最关键的区别是：**这不是用户手工维护的命令面板，而是 AI 在开发 loop 中主动维护的操作记忆。**
 
-## 主动维护机制
+模型负责发现、更新、去重和淘汰入口；用户始终保留执行权。模型创建命令并不会运行命令，创建 Prompt 也不会偷偷发送。
 
-插件注册了一段稳定的 `systemPrompt.section(...)`，要求模型在正常开发 loop 中持续判断：
+## 一分钟安装
 
-- 是否会再次用到这个命令、Prompt 或用户习惯性指令；
-- 它是否能省掉路径、设备、参数、窗口切换或重复措辞；
-- 应该跨工作区会话保留，还是只用于当前验收；
-- 是否已有相同 stable key 的动作需要更新，而不是新增；
-- 旧入口是否已经失效，需要隐藏。
+需要 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) 的 Web profile 和 Node.js 20+。
 
-同时提供一个可显式调用的 `dev-actions-maintainer` skill，用于让 AI 全面整理或审计当前动作库。日常主动发现依靠系统提示和工具，不要求用户先调用 skill。
+```sh
+dsh plugin --profile web add dsh-better-sidebar@^0.10.3 \
+  https://github.com/skitse/dsh-dev-actions/releases/latest/download/dsh-dev-actions.tgz
+```
 
-模型可用工具：
+重启 `dsh web` 并刷新浏览器，在 Better Sidebar 的“新建标签页”菜单中选择“快捷动作”。
 
-- `dev_action_upsert`：新增或更新动作；
-- `dev_action_list`：读取当前动作库；
-- `dev_action_retire`：隐藏已经过时的动作；
-- `dev_action_feedback_read`：读取用户的验收与问题反馈。
-
-## 安装
-
-当前 GitHub 仓库已经可用，但 `dsh-dev-actions` 尚未发布到 npm。请先使用本地链接安装，不要直接运行旧版 README 中的 npm 包命令。
+源码安装：
 
 ```sh
 git clone https://github.com/skitse/dsh-dev-actions.git
 cd dsh-dev-actions
 pnpm install
 pnpm build
-
-dsh plugin --profile web add dsh-better-sidebar@^0.10.3
-dsh plugin --profile web add link:"$(pwd)"
-dsh --profile web --dump-config
+dsh plugin --profile web add dsh-better-sidebar@^0.10.3 link:"$(pwd)"
 ```
 
-重启 `dsh web`，浏览器硬刷新后，在 Better Sidebar 的添加标签菜单中选择“快捷动作”。如果 DSH 使用自定义主目录，请为以上命令设置同一个 `DSH_HOME`。
+> 项目正在跟随 DSH developer preview 快速迭代，插件版本会固定兼容的 DSH RC 范围。
 
-## Flutter 示例
+## 它如何主动工作
 
-模型完成 Flutter 界面修改后，可以主动创建一个工作区动作：
+插件为当前 AI 注册一段持续生效的行为指引和四个固定工具。模型在开发过程中发现有复用价值的操作时，会调用 `dev_action_upsert`；相同 stable key 会更新原动作，不会越积越乱。
 
-```text
-dev_action_upsert({
-  key: "flutter.ios.run",
-  kind: "command",
-  label: "在 iOS 模拟器运行",
-  content: "flutter run -d 'iPhone 16 Pro'",
-  reason: "该项目每次界面修改后都需要在固定模拟器上验收。",
-  scope: "workspace"
-})
-```
+它会判断：
 
-后续设备或命令变化时，模型继续使用 `flutter.ios.run`，Panel 会更新原按钮而不是堆出重复项。Web、Xcode、Docker、后端服务、聚焦测试和日志观察都使用同一个机制，不需要为每种框架开发一套插件。
+- 这个操作是否很可能再次使用；
+- 是否能省掉路径、设备 ID、参数、窗口切换或重复措辞；
+- 应该跨项目会话保留，还是只用于当前验收；
+- 已有入口是否过时，需要更新或隐藏。
 
-## 安全边界
+动作支持工作区和会话两种范围，以及固定、隐藏、恢复、使用次数、验收通过和问题反馈。`dev-actions-maintainer` Skill 可让 AI 对整个动作库做一次集中整理，但日常主动发现不依赖用户调用 Skill。
 
-- AI 可以提出或更新动作，但不能因为提出动作而执行它。
-- Panel 完整显示命令、Prompt 或指令内容及其复用理由。
-- 浏览器提交服务器已经保存的 action ID 与内容版本指纹；动作有任何更新都会要求刷新并重新检查，不能替换命令或工作区路径。
-- Host 只使用 Session 上记录的权威工作区，并对路径做 `realpath` 解析。
-- 命令通过 DSH 自带的受管 Shell 和当前 Session 沙箱策略运行；环境会清除 credential-shaped 与 `DSH_*` 变量，停止操作终止并等待整棵进程树。
-- Prompt 只会在用户点击“发送”后成为新一轮消息；AI 指令默认只进入可编辑输入框。
-- 系统提示明确禁止把密钥、凭据、破坏性操作和一次性命令加入动作库。
-- 命令输出保留最近 128 KiB；活动运行会在插件卸载或 DSH 退出时被终止并等待退出。
-- Web API 沿用 DSH 已有的 Host 与同源请求边界，不新增任何部署配置。
+## 适合哪些开发
 
-插件不会自动点击任何按钮，也不会把模型生成的数据变成新的动态特权工具。模型只提供经过 schema 验证的动作数据；执行器、Prompt 通路和持久化边界都由插件固定实现。
+- **Flutter / iOS / Android**：记住设备与启动参数，一键运行、热启动或测试；
+- **Web 前端**：启动 dev server、运行 E2E、打开重复验收 Prompt；
+- **后端与容器**：启动服务、跑迁移检查、查看日志、执行聚焦测试；
+- **Xcode 与原生开发**：保存项目固定的构建、测试和模拟器命令；
+- **任何 AI 开发流程**：沉淀反复出现的验收步骤和协作指令。
 
-## 开发与验证
+它不为每个框架重写一套工作台。不同项目只需让 AI 把自己的高频入口放进同一个小面板。
+
+## 安全与控制
+
+- 动作内容和复用理由始终完整可见，执行或发送必须由用户点击；
+- 客户端提交 action ID 和内容版本指纹，内容更新后必须刷新并重新检查；
+- 命令只在 Session 绑定的权威工作区中运行；
+- 命令复用 DSH 的受管 Shell 与 Session 沙箱策略，清理凭据环境并管理进程树；
+- AI 指令默认只进入可编辑输入框；
+- schema、长度、数量和作用域均有固定边界，模型不能生成新的特权执行器。
+
+详细设计和验证方式见 [CONTRIBUTING.md](CONTRIBUTING.md)。
+
+## 欢迎一起开发
+
+这个插件最有价值的部分会来自不同开发者的真实工作流。现在尤其欢迎：
+
+- Flutter 设备发现、可选择运行目标和热重载体验；
+- dev server URL 自动识别与 Web 预览联动；
+- Xcode、Android、Docker、测试框架的动作建议策略；
+- 参数化动作、动作模板、导入导出和团队共享；
+- 风险提示、无障碍、多语言和面板交互改进；
+- 与其他 DSH 插件协作的通用动作协议。
+
+不必先理解整个 DSH。可以从带有 [`good first issue`](https://github.com/skitse/dsh-dev-actions/labels/good%20first%20issue) 或 [`help wanted`](https://github.com/skitse/dsh-dev-actions/labels/help%20wanted) 的任务开始，也可以用[场景提案](https://github.com/skitse/dsh-dev-actions/issues/new?template=workflow.yml)描述你每天重复做的那一步。
+
+## 开发验证
 
 ```sh
 pnpm install
@@ -91,8 +115,8 @@ pnpm build
 npm pack --dry-run
 ```
 
-发布前应在真实 DSH Web profile 中验证：client bundle 出现在 boot manifest（`exports["./package.json"]` 是 DSH 扫描包声明所必需的）；“快捷动作”标签可见；三种动作分别能运行、发送或填入输入框；工作区动作在新会话中仍存在；会话动作不会泄漏到其他会话；隐藏、恢复、固定、反馈和停止均正常。
+发布前还要在真实 DSH Web profile 中验证 client boot、模型工具调用、三种动作、跨会话持久化、日志和停止流程。当前版本已完成“模型创建动作 -> 面板出现 -> 用户点击 -> 命令执行 -> 日志返回”的浏览器 E2E。
 
 ## 当前边界
 
-本版本只解决“让用户一触即达”，不重建 IDE、设备控制或 GUI 自动化。其他插件以后可以把自己的高频操作接入同一种动作模型，但不属于本插件当前职责。
+本插件只解决“把重复操作变成一触即达的入口”。它不是远程 IDE，也不负责远程访问、设备画面流或任意 GUI 自动化；这些能力未来可以由专门插件提供，并与快捷动作协作。

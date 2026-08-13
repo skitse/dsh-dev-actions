@@ -1,8 +1,8 @@
 {
   "id": "skitse/dsh-dev-actions",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "main": "./lib/index.mjs",
-  "description": "AI-maintained reusable commands, prompts, and instructions as user-controlled DSH sidebar actions.",
+  "description": "AI turns repeated dev commands, prompts, and instructions into user-controlled one-click DSH actions.",
   "engines": { "dsh": ">=0.1.0-rc.6" },
   "contributes": { "tools": ["dev_action_upsert", "dev_action_list", "dev_action_retire", "dev_action_feedback_read"], "skills": ["dev-actions-maintainer"] },
   "client": { "main": "./lib/client-registry.js" }

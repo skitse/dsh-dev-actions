@@ -1,0 +1,54 @@
+name: 场景提案 / Workflow proposal
+description: 告诉我们你每天重复做的开发操作，以及理想的一键入口。
+title: "[Workflow] "
+labels:
+  - enhancement
+  - help wanted
+body:
+  - type: markdown
+    attributes:
+      value: |
+        不需要先设计 API。先把真实重复操作讲清楚，我们一起判断它应该成为命令、Prompt、AI 指令，还是另一个插件的能力。
+  - type: textarea
+    id: repeated-work
+    attributes:
+      label: 你反复在做什么？
+      description: 请描述当前步骤、使用频率，以及最烦的路径、设备 ID、参数或重复措辞。
+      placeholder: 每次修改 Flutter 页面后，我都要先查设备，再运行 flutter run -d ...
+    validations:
+      required: true
+  - type: dropdown
+    id: ecosystem
+    attributes:
+      label: 开发场景
+      options:
+        - Flutter / Dart
+        - iOS / Xcode
+        - Android
+        - Web frontend
+        - Backend / API
+        - Docker / infrastructure
+        - Tests / QA
+        - AI collaboration habit
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: desired-action
+    attributes:
+      label: 理想的一键入口
+      description: 点击后希望发生什么？哪些内容必须先让用户看见或修改？
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: 示例或证据
+      description: 可提供脱敏命令、截图、日志或项目链接。不要提交密钥和个人路径。
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: 参与方式
+      options:
+        - label: 我愿意帮助测试这个场景
+        - label: 我愿意尝试实现它

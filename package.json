@@ -1,7 +1,7 @@
 {
   "name": "dsh-dev-actions",
-  "version": "0.2.0",
-  "description": "AI-maintained reusable commands, prompts, and instructions for DeepSeek Harness.",
+  "version": "0.2.1",
+  "description": "AI turns repeated dev commands, prompts, and instructions into one-click DeepSeek Harness actions.",
   "type": "module",
   "main": "lib/index.mjs",
   "types": "lib/index.d.mts",
@@ -26,12 +26,34 @@
     "cordis.patch.yml",
     "dsh.plugin.json",
     "README.md",
+    "README.en.md",
+    "CONTRIBUTING.md",
+    "llms.txt",
+    "docs/assets",
     "LICENSE"
   ],
   "repository": {
     "type": "git",
     "url": "https://github.com/skitse/dsh-dev-actions"
   },
+  "homepage": "https://github.com/skitse/dsh-dev-actions#readme",
+  "bugs": {
+    "url": "https://github.com/skitse/dsh-dev-actions/issues"
+  },
+  "keywords": [
+    "deepseek",
+    "deepseek-harness",
+    "dsh",
+    "dsh-plugin",
+    "ai-agent",
+    "developer-tools",
+    "human-in-the-loop",
+    "workflow-automation",
+    "flutter",
+    "dev-server",
+    "prompt",
+    "productivity"
+  ],
   "publishConfig": {
     "access": "public"
   },
