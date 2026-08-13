@@ -29,11 +29,15 @@ function append(run: Run, text: string): void {
   run.output = (run.output + text).slice(-MAX_OUTPUT)
 }
 
-function cwdFor(ctx: DevActionsContext, sessionId: string, supplied?: string): string {
-  const header = ctx.sessions.get(sessionId)?.header.cwd
-  const cwd = header || supplied
+function cwdFor(ctx: DevActionsContext, sessionId: string): string {
+  const cwd = ctx.sessions.get(sessionId)?.header.cwd
   if (cwd === undefined || cwd === '') throw new Error('session has no workspace')
   return resolve(cwd)
+}
+
+function isTrustedRequest(req: import('node:http').IncomingMessage): boolean {
+  const host = req.headers.host?.split(':')[0]?.toLowerCase()
+  return host === 'localhost' || host === '127.0.0.1' || host === '[::1]'
 }
 
 async function flutterAvailable(cwd: string): Promise<boolean> {
@@ -50,7 +54,7 @@ function registerOfferTool(ctx: DevActionsContext): () => void {
     name: 'dev_action_offer',
     description: 'Offer the user a safe, session-scoped development action in the Dev Actions panel. Use this after changing code when the user should run or inspect the app. Do not pass shell commands or device ids.',
     parameters: {
-      action: { type: 'string', enum: ['flutter.run', 'flutter.test', 'flutter.analyze'], required: true },
+      action: { type: 'string', enum: ['flutter.run'], required: true },
       message: { type: 'string', required: true },
       suggestedDevice: { type: 'string' },
     },
@@ -75,11 +79,12 @@ export function apply(ctx: DevActionsContext): void {
     kind: 'prefix',
     path: '/dev-actions/api',
     handler: async (req, res) => {
+      if (!isTrustedRequest(req)) { fail(res, 403, 'untrusted host'); return }
       if (req.method !== 'POST') { fail(res, 405, 'method not allowed'); return }
       try {
         const body = await readJson(req)
         const sessionId = stringField(body, 'sessionId')
-        const cwd = cwdFor(ctx, sessionId, typeof body.cwd === 'string' ? body.cwd : undefined)
+        const cwd = cwdFor(ctx, sessionId)
         const path = new URL(req.url ?? '/', 'http://dsh.internal').pathname.slice('/dev-actions/api/'.length)
         if (path === 'state') {
           const isFlutter = await flutterAvailable(cwd)

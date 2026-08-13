@@ -1,7 +1,7 @@
 export interface Scope { sessionId: string; cwd?: string }
 export interface Device { id: string; name: string }
 export interface Run { id: string; command: string; output: string; exited: boolean; exitCode: number | null }
-export interface Offer { id: string; action: 'flutter.run' | 'flutter.test' | 'flutter.analyze'; message: string; suggestedDevice?: string; createdAt: number }
+export interface Offer { id: string; action: 'flutter.run'; message: string; suggestedDevice?: string; createdAt: number }
 
 async function call<T>(path: string, scope: Scope, extra: Record<string, unknown> = {}): Promise<T> {
   const response = await fetch(`/dev-actions/api/${path}`, {

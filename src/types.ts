@@ -20,7 +20,7 @@ export type DevActionsContext = Context & {
 
 export interface Offer {
   id: string
-  action: 'flutter.run' | 'flutter.test' | 'flutter.analyze'
+  action: 'flutter.run'
   message: string
   suggestedDevice?: string
   createdAt: number

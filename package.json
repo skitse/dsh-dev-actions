@@ -3,15 +3,15 @@
   "version": "0.1.0",
   "description": "A small DeepSeek Harness companion panel for fast, session-scoped development actions.",
   "type": "module",
-  "main": "lib/index.js",
-  "types": "lib/types/index.d.ts",
+  "main": "lib/index.mjs",
+  "types": "lib/index.d.mts",
   "exports": {
     ".": {
-      "types": "./lib/types/index.d.ts",
-      "default": "./lib/index.js"
+      "types": "./lib/index.d.mts",
+      "default": "./lib/index.mjs"
     },
     "./client": {
-      "types": "./lib/types/client/index.d.ts",
+      "types": "./lib/client.d.ts",
       "default": "./lib/client.js"
     }
   },

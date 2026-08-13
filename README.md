@@ -46,7 +46,7 @@ The panel resolves the real device IDs independently. The user may run the app, 
 
 ## Security Boundary
 
-- The host uses the session's authoritative workspace directory when available.
+- The host requires the session's authoritative attached workspace directory and never accepts a browser-provided path.
 - The model never supplies a raw command, a device ID, or a path to `dev_action_offer`.
 - Only `flutter run`, `r`, `R`, and stop are exposed in this release.
 - Output is bounded to 128 KiB and stays local to the current DSH host process.
