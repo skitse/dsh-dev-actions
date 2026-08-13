@@ -2,7 +2,7 @@
 
 **让 AI 把你会重复做的开发操作，主动变成对话旁边的一键按钮。**
 
-[English](README.en.md) | [安装](#一分钟安装) | [参与开发](CONTRIBUTING.md) | [路线图](#欢迎一起开发)
+[English](README.en.md) | [安装](#两分钟安装) | [参与开发](CONTRIBUTING.md) | [路线图](#欢迎一起开发)
 
 [![DeepSeek Harness](https://img.shields.io/badge/DeepSeek-Harness-4b73ff)](https://github.com/deepseek-ai/deepseek-harness)
 [![DSH Plugin](https://img.shields.io/badge/topic-dsh--plugin-238636)](https://github.com/topics/dsh-plugin)
@@ -35,9 +35,15 @@
 
 模型负责发现、更新、去重和淘汰入口；用户始终保留执行权。模型创建命令并不会运行命令，创建 Prompt 也不会偷偷发送。
 
-## 一分钟安装
+## 两分钟安装
 
-需要 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) 的 Web profile 和 Node.js 20+。
+需要 Node.js 22.19+（或 24+）。如果你平时只用 `npx @deepseek-ai/dsh web`，先安装 DSH CLI 和它管理插件所需的 pnpm：
+
+```sh
+npm install --global @deepseek-ai/dsh@0.1.0-rc.6 pnpm@10.32.1
+```
+
+然后安装插件：
 
 ```sh
 dsh plugin --profile web add dsh-better-sidebar@^0.10.3 \
@@ -46,7 +52,7 @@ dsh plugin --profile web add dsh-better-sidebar@^0.10.3 \
 
 重启 `dsh web` 并刷新浏览器，在 Better Sidebar 的“新建标签页”菜单中选择“快捷动作”。
 
-源码安装：
+源码开发同样需要 Node.js 22.19+ 和 pnpm 10：
 
 ```sh
 git clone https://github.com/skitse/dsh-dev-actions.git

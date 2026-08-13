@@ -25,7 +25,9 @@ The model can create, update, deduplicate, list, and retire actions. It cannot e
 
 ## Install
 
-Requires DeepSeek Harness Web and Node.js 20+.
+Requires Node.js 22.19+ (or 24+), DeepSeek Harness Web, a `dsh` CLI on PATH, and pnpm 10. Install the CLI prerequisites first:
+
+    npm install --global @deepseek-ai/dsh@0.1.0-rc.6 pnpm@10.32.1
 
     dsh plugin --profile web add dsh-better-sidebar@^0.10.3 https://github.com/skitse/dsh-dev-actions/releases/latest/download/dsh-dev-actions.tgz
 

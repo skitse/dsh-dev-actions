@@ -30,9 +30,15 @@ This is not a manually managed command palette. It is **AI-maintained operationa
 
 The model may discover, update, deduplicate, and retire entries. It cannot execute or send one merely by creating it; every consequential action remains an explicit user click.
 
-## One-minute install
+## Two-minute install
 
-Requires the [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) Web profile and Node.js 20+.
+Requires Node.js 22.19+ (or 24+). If you normally start DSH only with `npx @deepseek-ai/dsh web`, first install the DSH CLI and the pnpm executable its plugin manager uses:
+
+```sh
+npm install --global @deepseek-ai/dsh@0.1.0-rc.6 pnpm@10.32.1
+```
+
+Then install the plugin:
 
 ```sh
 dsh plugin --profile web add dsh-better-sidebar@^0.10.3 \
@@ -41,7 +47,7 @@ dsh plugin --profile web add dsh-better-sidebar@^0.10.3 \
 
 Restart `dsh web`, refresh the browser, and select **Dev Actions / 快捷动作** from Better Sidebar's new-tab menu.
 
-Source install:
+Source development also requires Node.js 22.19+ and pnpm 10:
 
 ```sh
 git clone https://github.com/skitse/dsh-dev-actions.git

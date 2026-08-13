@@ -35,6 +35,8 @@
 
 ## 本地开发
 
+需要 Node.js 22.19+（或 24+）和 pnpm 10。
+
 ```sh
 pnpm install
 pnpm typecheck
